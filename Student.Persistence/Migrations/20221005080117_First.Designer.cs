@@ -11,7 +11,7 @@ using Student.Persistence;
 namespace Student.Persistence.Migrations
 {
     [DbContext(typeof(DataContext))]
-    [Migration("20221004225325_First")]
+    [Migration("20221005080117_First")]
     partial class First
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -51,6 +51,47 @@ namespace Student.Persistence.Migrations
                     b.HasIndex("StudentsAdmissionNumber");
 
                     b.ToTable("CourseStudent");
+                });
+
+            modelBuilder.Entity("Student.Model.Admin", b =>
+                {
+                    b.Property<string>("AdminId")
+                        .HasColumnType("text");
+
+                    b.Property<string>("PasswordHash")
+                        .HasColumnType("text");
+
+                    b.HasKey("AdminId");
+
+                    b.ToTable("Admins");
+                });
+
+            modelBuilder.Entity("Student.Model.Administrator", b =>
+                {
+                    b.Property<string>("AdminId")
+                        .HasColumnType("text");
+
+                    b.Property<string>("DepartmentId")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("Firstname")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("Lastname")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("Position")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.HasKey("AdminId");
+
+                    b.HasIndex("DepartmentId");
+
+                    b.ToTable("Administrators");
                 });
 
             modelBuilder.Entity("Student.Model.Course", b =>
@@ -151,6 +192,17 @@ namespace Student.Persistence.Migrations
                         .IsRequired();
                 });
 
+            modelBuilder.Entity("Student.Model.Administrator", b =>
+                {
+                    b.HasOne("Student.Model.Department", "Department")
+                        .WithMany("Admins")
+                        .HasForeignKey("DepartmentId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Department");
+                });
+
             modelBuilder.Entity("Student.Model.Student", b =>
                 {
                     b.HasOne("Student.Model.Department", "Department")
@@ -164,6 +216,8 @@ namespace Student.Persistence.Migrations
 
             modelBuilder.Entity("Student.Model.Department", b =>
                 {
+                    b.Navigation("Admins");
+
                     b.Navigation("Students");
                 });
 #pragma warning restore 612, 618

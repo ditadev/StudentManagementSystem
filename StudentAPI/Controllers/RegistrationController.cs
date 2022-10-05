@@ -20,7 +20,7 @@ public class RegistrationController : ControllerBase
     }
 
     [HttpPost]
-    public async Task<ActionResult<User>> Register(User user)
+    public async Task<ActionResult<User>> RegisterStudent(User user)
     {
         var passwordHash = _registrationService.CreatPasswordHash(user.Password);
         var User = await _dataContext.Users.FirstOrDefaultAsync(x => x.AdmissionNumber == user.AdmissionNumber);

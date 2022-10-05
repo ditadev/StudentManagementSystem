@@ -30,7 +30,32 @@ public class RegistrationService : IRegistrationService
     {
         var claims = new List<Claim>
         {
-            new(ClaimTypes.Name, user.AdmissionNumber)
+            new(ClaimTypes.Name, user.AdmissionNumber),
+            new (ClaimTypes.Role,"Student")
+        };
+
+        var key = new SymmetricSecurityKey(
+            Encoding.UTF8.GetBytes(_configuration.GetSection("AppSettings:Token").Value));
+
+        var cred = new SigningCredentials(key, SecurityAlgorithms.HmacSha512Signature);
+
+        var token = new JwtSecurityToken
+        (
+            claims: claims,
+            expires: DateTime.Now.AddMinutes(30),
+            signingCredentials: cred
+        );
+        var jwt = new JwtSecurityTokenHandler().WriteToken(token);
+
+        return await Task.FromResult(jwt);
+    }
+    
+    public async Task<string?> CreateAdminToken(Admin admin)
+    {
+        var claims = new List<Claim>
+        {
+            new(ClaimTypes.Name, admin.AdminId),
+            new (ClaimTypes.Role,"Admin")
         };
 
         var key = new SymmetricSecurityKey(
