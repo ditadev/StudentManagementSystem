@@ -30,6 +30,7 @@ public class DataContext : DbContext
         courses.HasKey(c => c.CourseCode);
         student.HasKey(s => s.AdmissionNumber);
         department.HasKey(d => d.DepartmentId);
+        
         courses.Ignore(x => x.AdmissionNumber);
         user.Ignore(x => x.Password);
         student.Property(s => s.Firstname).IsRequired();

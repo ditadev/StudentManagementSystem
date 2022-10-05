@@ -1,6 +1,6 @@
 namespace Student.Services;
-
+using Student.Model;
 public interface IStudentService
 {
-    public Task<Model.Student> GetStudentByAdmissionNumber(string admissionNumber);
+    public Task<Student> GetStudentByAdmissionNumber(string admissionNumber);
 }

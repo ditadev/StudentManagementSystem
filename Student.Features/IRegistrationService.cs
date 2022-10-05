@@ -1,5 +1,4 @@
 using Student.Model;
-
 namespace Student.Services;
 
 public interface IRegistrationService
