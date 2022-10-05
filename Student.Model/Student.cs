@@ -1,16 +1,15 @@
-using System.ComponentModel.DataAnnotations;
 using System.Text.Json.Serialization;
 
 namespace Student.Model;
 
 public class Student
 {
-    [Key]
-    public int AdmissionNumber { get; set; }
-    public string FirstName { get; set; }
-    public string LastName { get; set; }
-    [JsonIgnore]
+    public string AdmissionNumber { get; set; }
+    public string Firstname { get; set; }
+    public string Lastname { get; set; }
     public Department Department { get; set; }
-    public int DepartmentId { get; set; }
+
+    [JsonIgnore] public string DepartmentId { get; set; }
+
     public List<Course> Courses { get; set; }
 }

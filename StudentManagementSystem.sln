@@ -6,7 +6,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Student.Model", "Student.Mo
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Student.Persistence", "Student.Persistence\Student.Persistence.csproj", "{3FA1474B-621D-43B6-B1DD-4C27A8CB4F51}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Student.Services", "Student.Services\Student.Services.csproj", "{260FFC10-2011-40C0-921D-74D9A7B6030F}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Student.Features", "Student.Features\Student.Features.csproj", "{260FFC10-2011-40C0-921D-74D9A7B6030F}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

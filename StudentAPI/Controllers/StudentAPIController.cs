@@ -1,73 +1,27 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Student.Model;
 using Student.Services;
-using StudentAPI.Dtos;
 
-namespace StudentAPI.Controllers
+namespace StudentAPI.Controllers;
+
+[Route("api/[controller]/[action]")]
+[ApiController]
+[Authorize]
+public class StudentApiController : ControllerBase
 {
-    [Route("api/[controller]/[action]")]
-    [ApiController]
-    public class StudentAPIController : ControllerBase
+    private readonly IStudentService _studentService;
+
+    public StudentApiController(IStudentService studentService)
     {
-        private readonly IStudentService _studentService;
+        _studentService = studentService;
+    }
 
-        public StudentAPIController(IStudentService studentService)
-        {
-            _studentService = studentService;
-        }
+    [HttpGet("admissionNumber")]
+    public async Task<ActionResult<Student.Model.Student>> GetStudentByAdmissionNumber(string admissionNumber)
+    {
+        var students = await _studentService.GetStudentByAdmissionNumber(admissionNumber);
+        if (students == null) return BadRequest("No Student with such Admission number");
 
-        [HttpPost]
-        public async Task<ActionResult<Student.Model.Student>> AddStudent(NewStudentDTO student)
-        {
-            var add= await _studentService.AddStudent(student);
-            if (add==null)
-            {
-                return BadRequest("No Student with such Admission number");
-            }
-
-            return Ok(add);
-        }
-
-        [HttpPost]
-        public async Task<ActionResult<Student.Model.Student>> AddStudentCourses(NewCourseDTO courseDto)
-        {
-            var add =  await _studentService.AddStudentCourses(courseDto);
-            if (add==null)
-            {
-                return BadRequest("No Student with such Admission number");
-            }
-
-            return Ok(add);
-        }
-
-        [HttpGet("departmentId")]
-
-        public async Task<ActionResult<List<Student.Model.Student>>> GetStudentsByDepartment(int departmentId)
-        {
-            var res=  await _studentService.GetStudentsByDepartment(departmentId);
-            // if (res==null)
-            // {
-            //     return BadRequest("No Student with such Admission number");
-            // }
-
-            return Ok(res);
-        }
-
-        [HttpGet("admissionNumber")]
-        public async Task<ActionResult<Student.Model.Student>> GetStudentByAdmissionNumber(int admissionNumber)
-        {
-            var res =await _studentService.GetStudentByAdmissionNumber(admissionNumber);
-            if (res==null)
-            {
-                return BadRequest("No Student with such Admission number");
-            }
-
-            return Ok(res);
-        }
+        return Ok(students);
     }
 }
