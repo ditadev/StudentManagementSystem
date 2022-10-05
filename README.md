@@ -1,2 +1,2 @@
 # StudentManagementSystem
-Student management Backend with jwt using User based authentication.
+Student Management System Backend with jwt using Role Based Authentication.
