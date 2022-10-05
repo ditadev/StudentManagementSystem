@@ -14,7 +14,7 @@ public class DataContext : DbContext
     {
     }
 
-    
+
     public DbSet<Department> Departments { get; set; }
     public DbSet<Course> Courses { get; set; }
     public DbSet<Model.Student> Students { get; set; }
@@ -37,7 +37,7 @@ public class DataContext : DbContext
         student.HasKey(s => s.AdmissionNumber);
         department.HasKey(d => d.DepartmentId);
         administrator.HasKey(a => a.AdminId);
-        
+
         courses.Ignore(x => x.AdmissionNumber);
         user.Ignore(x => x.Password);
         admin.Ignore(x => x.Password);

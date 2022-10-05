@@ -16,7 +16,8 @@ public class StudentApiController : ControllerBase
         _studentService = studentService;
     }
 
-    [HttpGet("admissionNumber"),Authorize(Roles = "Student")]
+    [HttpGet("admissionNumber")]
+    [Authorize(Roles = "Student")]
     public async Task<ActionResult<Student.Model.Student>> GetStudentByAdmissionNumber(string admissionNumber)
     {
         var students = await _studentService.GetStudentByAdmissionNumber(admissionNumber);

@@ -1,4 +1,5 @@
 using System.Text.Json.Serialization;
+
 namespace Student.Model;
 
 public class Administrator
@@ -9,5 +10,4 @@ public class Administrator
     public string Position { get; set; }
     public Department Department { get; set; }
     [JsonIgnore] public string DepartmentId { get; set; }
-    
 }

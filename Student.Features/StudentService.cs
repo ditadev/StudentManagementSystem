@@ -1,6 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using Student.Persistence;
-using Student.Model;
+
 namespace Student.Services;
 
 public class StudentService : IStudentService

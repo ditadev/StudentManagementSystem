@@ -52,7 +52,7 @@ public class RegistrationController : ControllerBase
         if (_registrationService.VerifyPasswordHash(user.Password, User.PasswordHash) == false)
             return BadRequest("Wrong username/password");
 
-        var token = await _registrationService.CreateToken(User);
+        var token = await _registrationService.CreateStudentToken(User);
         return Ok(token);
     }
 }

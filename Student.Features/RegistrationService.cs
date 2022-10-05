@@ -26,12 +26,12 @@ public class RegistrationService : IRegistrationService
         return BCrypt.Net.BCrypt.Verify(password, passwordHash);
     }
 
-    public async Task<string?> CreateToken(User user)
+    public async Task<string?> CreateStudentToken(User user)
     {
         var claims = new List<Claim>
         {
             new(ClaimTypes.Name, user.AdmissionNumber),
-            new (ClaimTypes.Role,"Student")
+            new(ClaimTypes.Role, "Student")
         };
 
         var key = new SymmetricSecurityKey(
@@ -49,13 +49,13 @@ public class RegistrationService : IRegistrationService
 
         return await Task.FromResult(jwt);
     }
-    
+
     public async Task<string?> CreateAdminToken(Admin admin)
     {
         var claims = new List<Claim>
         {
             new(ClaimTypes.Name, admin.AdminId),
-            new (ClaimTypes.Role,"Admin")
+            new(ClaimTypes.Role, "Admin")
         };
 
         var key = new SymmetricSecurityKey(
