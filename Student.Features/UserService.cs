@@ -11,13 +11,47 @@ namespace Student.Services;
 
 public class UserService : IUserService
 {
-    private readonly IConfiguration _configuration;
+    private readonly AppSettings _appSettings;
     private readonly DataContext _dataContext;
 
-    public UserService(DataContext dataContext, IConfiguration configuration)
+    public UserService(DataContext dataContext, AppSettings appSettings)
     {
         _dataContext = dataContext;
-        _configuration = configuration;
+        _appSettings = appSettings;
+    }
+
+    public async Task<User?> GetUserByEmail(string emailAddress)
+    {
+        return await _dataContext.Users.Where(u => u != null && u.EmailAddress == emailAddress)
+            .Include(u=>u.Department)
+            .Include(u=>u.Courses)
+            .SingleOrDefaultAsync();
+    }
+
+    public async Task AddUser(User user)
+    {
+        _dataContext.Add(user);
+        await _dataContext.SaveChangesAsync();
+    }
+
+    public async Task DeleteUser(string admissionNumber)
+    {
+        var user = await GetStudentByAdmissionNumber(admissionNumber);
+        _dataContext.Users.Remove(user);
+       await _dataContext.SaveChangesAsync();
+    }
+
+    public async Task<Department?> GetDepartmentById(string departmentId)
+    {
+        return await _dataContext.Departments.Where(d => d.DepartmentId == departmentId)
+            .Include(x => x.Courses)
+            .SingleOrDefaultAsync();
+    }
+
+    public async Task<List<Course>> GetCoursesByDepartment(string departmentId)
+    {
+        return await _dataContext.Courses.Where(c => c.DepartmentId == departmentId)
+            .ToListAsync();
     }
 
     public async Task<string?> CreatPasswordHash(string password)
@@ -30,38 +64,33 @@ public class UserService : IUserService
         return BCrypt.Net.BCrypt.Verify(password, passwordHash);
     }
 
-    public async Task<string?> CreateJwt(User user)
+    public Task<string> CreateJwt(User user)
     {
-        var claims = new List<Claim>
-        {
-            new(ClaimTypes.Name, user.IdentificationNumber),
-            new(ClaimTypes.Role, "Student")
-        };
-
-        var key = new SymmetricSecurityKey(
-            Encoding.UTF8.GetBytes(_configuration.GetSection("AppSettings:Token").Value));
-
+        var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_appSettings.JwtSecret));
         var cred = new SigningCredentials(key, SecurityAlgorithms.HmacSha512Signature);
+        var claims = new List<Claim> { new("userAdmissionNumber", user.IdentificationNumber),
+            new("sub", user.UserId.ToString()), 
+            new("role", "Default") };
+        
+        claims.AddRange(user.Roles.Select(role => new Claim("role", role.ToString())));
 
-        var token = new JwtSecurityToken
-        (
-            claims: claims,
-            expires: DateTime.Now.AddMinutes(30),
-            signingCredentials: cred
-        );
-        var jwt = new JwtSecurityTokenHandler().WriteToken(token);
-
-        return await Task.FromResult(jwt);
+        return Task.FromResult((new JwtSecurityTokenHandler().WriteToken(
+            new JwtSecurityToken
+            (
+                claims: claims,
+                expires: DateTime.Now.AddDays(1),
+                signingCredentials: cred
+            ))));
     }
 
-    public async Task<User?> GetStudentByAdmissionNumber(string admissionNumber)
+    public async Task<User> GetStudentByAdmissionNumber(string admissionNumber)
     {
-        var student = await _dataContext.Users
+        return await _dataContext.Users
             .Where(x => x.IdentificationNumber == admissionNumber)
             .Include(x => x.Courses)
             .Include(x => x.Department)
-            .FirstOrDefaultAsync();
-        if (student == null) return null;
-        return student;
+            .SingleOrDefaultAsync();;
     }
+    
+    
 }

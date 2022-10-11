@@ -10,5 +10,6 @@ public class Course : IEntityTypeConfiguration<Model.Course>
         builder.HasKey(c => c.CourseCode);
         builder.Property(c => c.CourseTitle).IsRequired();
         builder.Property(c => c.CreditLoad).IsRequired();
+        builder.Property(c => c.DepartmentId).IsRequired();
     }
 }

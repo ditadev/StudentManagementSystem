@@ -2,12 +2,13 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Student.Model;
 using Student.Services;
+using StudentAPI.Attributes;
 
 namespace StudentAPI.Controllers;
 
 [Route("api/[controller]/[action]")]
 [ApiController]
-[Authorize]
+[Microsoft.AspNetCore.Authorization.Authorize]
 public class UserController : AbstractController
 {
     private readonly IUserService _userService;
@@ -17,13 +18,22 @@ public class UserController : AbstractController
         _userService = userService;
     }
 
-    [HttpGet("admissionNumber")]
-    [Authorize(Roles = "Student")]
-    public async Task<ActionResult<User>> GetStudentByAdmissionNumber(string admissionNumber)
+    [HttpGet]
+    [AllowAnonymous]
+    public async Task<ActionResult<User>> GetCurrentUser()
     {
-        var students = await _userService.GetStudentByAdmissionNumber(admissionNumber);
-        if (students == null) return BadRequest("No Student with such Admission number");
+        var userIdNumber = GetContextUserIdentificationNumber();
+        var students = await _userService.GetStudentByAdmissionNumber(userIdNumber);
+        if (students == null) return NotFound("Not Found");
 
         return Ok(students);
+    }
+
+    [HttpDelete]
+    [Attributes.Authorize(Role.HeadOfDepartment)]
+    public async Task<ActionResult> DeleteUser(string admissionNumber)
+    {
+        await _userService.DeleteUser(admissionNumber);
+        return Ok("Student Deleted");
     }
 }

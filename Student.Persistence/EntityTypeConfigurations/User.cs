@@ -15,5 +15,6 @@ public class User : IEntityTypeConfiguration<Model.User>
         builder.Property(u => u.EmailAddress).IsRequired();
         builder.HasIndex(u => u.EmailAddress).IsUnique();
         builder.Property(u => u.Roles).IsRequired();
+        builder.Ignore(u => u.Password);
     }
 }

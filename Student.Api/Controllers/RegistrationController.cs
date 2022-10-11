@@ -21,41 +21,48 @@ public class RegistrationController : AbstractController
     }
 
     [HttpPost]
-    public async Task<ActionResult<User>> Register(RegisterUserRequest request)
+    public async Task<ActionResult> Register(RegisterUserRequest request)
     {
-        var passwordHash = _userService.CreatPasswordHash(request.Password);
-        var User = await _dataContext.Users.FirstOrDefaultAsync(x =>
-            x.IdentificationNumber == request.IdentificationNumber);
-        var checkUser = await _dataContext.Users.Where(x => x.IdentificationNumber == request.IdentificationNumber)
-            .FirstOrDefaultAsync();
-        if (User == null && checkUser != null)
+        var passwordHash = await _userService.CreatPasswordHash(request.Password);
+        var department = await _userService.GetDepartmentById(request.DepartmentId);
+        var courses = await _userService.GetCoursesByDepartment(request.DepartmentId);
+        var User = await _userService.GetStudentByAdmissionNumber(request.IdentificationNumber);
+        var userByEmail = await _userService.GetUserByEmail(request.EmailAddress);
+        if (User == null)
         {
-            var res = new User
+            if (userByEmail == null)
             {
-                IdentificationNumber = request.IdentificationNumber,
-                PasswordHash = await passwordHash
-            };
-
-            _dataContext.Users.Add(res);
-            await _dataContext.SaveChangesAsync();
-            return Ok(res);
+                var res = new User
+                {
+                    IdentificationNumber = request.IdentificationNumber,
+                    FirstName = request.FirstName,
+                    LastName = request.LastName,
+                    PhoneNumber = request.PhoneNumber,
+                    DepartmentId = request.DepartmentId,
+                    Department = department,
+                    PasswordHash = passwordHash,
+                    Courses = courses,
+                    EmailAddress = request.EmailAddress,
+                    Roles = new List<Role> { Role.Student }
+                };
+                await _userService.AddUser(res);
+                return Ok("Successful :)");
+            }
+            return BadRequest("User Already Exist :(");
         }
 
-        return BadRequest("Try again with a valid/unused Admission Number");
+        return BadRequest("User Already Exist :(");
     }
 
     [HttpPost]
     public async Task<ActionResult<string>> Login(LoginUserRequest request)
     {
-        var User = await _dataContext.Users.FirstOrDefaultAsync(x =>
-            x.IdentificationNumber == request.IdentificationNumber);
-
-        if (User == null) return BadRequest("Wrong username/password");
-
-        if (_userService.VerifyPasswordHash(request.Password, User.PasswordHash) == false)
+        var user = await _userService.GetStudentByAdmissionNumber(request.IdentificationNumber);
+        if (user==null) 
             return BadRequest("Wrong username/password");
-
-        var token = await _userService.CreateJwt(User);
-        return Ok(token);
+        if (_userService.VerifyPasswordHash(request.Password, user.PasswordHash) == false)
+            return BadRequest("Wrong username/password");
+        
+        return Ok(new JwtDto{AccessToken = await _userService.CreateJwt(user)});
     }
 }

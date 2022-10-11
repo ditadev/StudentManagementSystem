@@ -10,9 +10,10 @@ public class User
     public string LastName { get; set; }
     public string EmailAddress { get; set; }
     public string PhoneNumber { get; set; }
-    [JsonIgnore] public string PasswordHash { get; set; }
-    public Department Department { get; set; }
+    [JsonIgnore] public string? PasswordHash { get; set; }
+    [JsonIgnore] public string Password { get; set; }
+    public Department? Department { get; set; }
     [JsonIgnore] public string DepartmentId { get; set; }
-    public List<Role> Roles { get; set; }
+    [JsonIgnore] public List<Role> Roles { get; set; }
     public List<Course> Courses { get; set; }
 }

@@ -9,6 +9,7 @@ public class RegisterUserRequest
     public string IdentificationNumber { get; set; }
     public string FirstName { get; set; }
     public string LastName { get; set; }
+    public string DepartmentId { get; set; }
 
     [Required(ErrorMessage = "Phone number is required!")]
     [RegularExpression(@"^\+[1-9]\d{1,14}$", ErrorMessage = "Please enter valid phone number!")]

@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using Student.Persistence;
@@ -11,9 +12,10 @@ using Student.Persistence;
 namespace Student.Persistence.Migrations
 {
     [DbContext(typeof(DataContext))]
-    partial class DataContextModelSnapshot : ModelSnapshot
+    [Migration("20221011084904_second")]
+    partial class second
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -55,6 +57,10 @@ namespace Student.Persistence.Migrations
             modelBuilder.Entity("Student.Model.Course", b =>
                 {
                     b.Property<string>("CourseCode")
+                        .HasColumnType("text");
+
+                    b.Property<string>("AdmissionNumber")
+                        .IsRequired()
                         .HasColumnType("text");
 
                     b.Property<string>("CourseTitle")
