@@ -1,18 +1,22 @@
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 using Student.Model;
+using Student.Persistence;
 
 namespace Student.Services;
 
-public class RegistrationService : IRegistrationService
+public class UserService : IUserService
 {
+    private readonly DataContext _dataContext;
     private readonly IConfiguration _configuration;
 
-    public RegistrationService(IConfiguration configuration)
+    public UserService(DataContext dataContext,IConfiguration configuration)
     {
+        _dataContext = dataContext;
         _configuration = configuration;
     }
 
@@ -26,11 +30,11 @@ public class RegistrationService : IRegistrationService
         return BCrypt.Net.BCrypt.Verify(password, passwordHash);
     }
 
-    public async Task<string?> CreateStudentToken(User user)
+    public async Task<string?> CreateJwt(User user)
     {
         var claims = new List<Claim>
         {
-            new(ClaimTypes.Name, user.AdmissionNumber),
+            new(ClaimTypes.Name, user.IdentificationNumber),
             new(ClaimTypes.Role, "Student")
         };
 
@@ -49,28 +53,15 @@ public class RegistrationService : IRegistrationService
 
         return await Task.FromResult(jwt);
     }
-
-    public async Task<string?> CreateAdminToken(Admin admin)
+    
+    public async Task<Model.User?> GetStudentByAdmissionNumber(string admissionNumber)
     {
-        var claims = new List<Claim>
-        {
-            new(ClaimTypes.Name, admin.AdminId),
-            new(ClaimTypes.Role, "Admin")
-        };
-
-        var key = new SymmetricSecurityKey(
-            Encoding.UTF8.GetBytes(_configuration.GetSection("AppSettings:Token").Value));
-
-        var cred = new SigningCredentials(key, SecurityAlgorithms.HmacSha512Signature);
-
-        var token = new JwtSecurityToken
-        (
-            claims: claims,
-            expires: DateTime.Now.AddMinutes(30),
-            signingCredentials: cred
-        );
-        var jwt = new JwtSecurityTokenHandler().WriteToken(token);
-
-        return await Task.FromResult(jwt);
+        var student = await _dataContext.Users
+            .Where(x => x.IdentificationNumber == admissionNumber)
+            .Include(x => x.Courses)
+            .Include(x => x.Department)
+            .FirstOrDefaultAsync();
+        if (student == null) return null;
+        return student;
     }
 }

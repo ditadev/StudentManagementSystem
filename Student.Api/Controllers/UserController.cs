@@ -7,20 +7,20 @@ namespace StudentAPI.Controllers;
 [Route("api/[controller]/[action]")]
 [ApiController]
 [Authorize]
-public class StudentApiController : ControllerBase
+public class UserController : AbstractController
 {
-    private readonly IStudentService _studentService;
+    private readonly IUserService _userService;
 
-    public StudentApiController(IStudentService studentService)
+    public UserController(IUserService userService)
     {
-        _studentService = studentService;
+        _userService = userService;
     }
 
     [HttpGet("admissionNumber")]
     [Authorize(Roles = "Student")]
-    public async Task<ActionResult<Student.Model.Student>> GetStudentByAdmissionNumber(string admissionNumber)
+    public async Task<ActionResult<Student.Model.User>> GetStudentByAdmissionNumber(string admissionNumber)
     {
-        var students = await _studentService.GetStudentByAdmissionNumber(admissionNumber);
+        var students = await _userService.GetStudentByAdmissionNumber(admissionNumber);
         if (students == null) return BadRequest("No Student with such Admission number");
 
         return Ok(students);

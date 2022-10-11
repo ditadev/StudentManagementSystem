@@ -1,6 +1,6 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StudentAPI", "StudentAPI\StudentAPI.csproj", "{C55A5B56-AD2A-4A72-B8A9-0230FB867F8A}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Student.Api", "Student.Api\Student.Api.csproj", "{C55A5B56-AD2A-4A72-B8A9-0230FB867F8A}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Student.Model", "Student.Model\Student.Model.csproj", "{8CE9CEA4-1D98-4704-B3AC-3FB206736865}"
 EndProject

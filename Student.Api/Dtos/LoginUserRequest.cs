@@ -2,8 +2,9 @@ using System.ComponentModel.DataAnnotations;
 
 namespace StudentAPI.Dtos;
 
-public class LoginAuthorRequest
+public class LoginUserRequest
 {
-    [Required] [EmailAddress] public string EmailAddress { get; set; }
+    [Required] [EmailAddress] public string IdentificationNumber { get; set; }
     [Required] public string Password { get; set; }
 }
+

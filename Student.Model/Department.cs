@@ -5,8 +5,7 @@ namespace Student.Model;
 public class Department
 {
     public string DepartmentId { get; set; }
-    public string Name { get; set; }
-    [JsonIgnore] public List<Student> Students { get; set; }
-    [JsonIgnore] public List<Administrator> Admins { get; set; }
+    public string DepartmentName { get; set; }
+    [JsonIgnore] public List<User> Users { get; set; }
     [JsonIgnore] public List<Course> Courses { get; set; }
 }
