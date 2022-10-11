@@ -8,15 +8,18 @@ using Student.Services;
 using Swashbuckle.AspNetCore.Filters;
 
 var builder = WebApplication.CreateBuilder(args);
+var config = new ConfigurationBuilder()
+    .AddJsonFile("appsettings.json", false, true)
+    .AddJsonFile("appsettings.local.json", false, true)
+    .AddEnvironmentVariables()
+    .Build();
+var appSettings = config.GetSection("AppSettings").Get<AppSettings>();
 
-// Add services to the container.
-
+builder.Services.AddSingleton(appSettings);
 builder.Services.AddControllers();
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddScoped<IStudentService, StudentService>();
-builder.Services.AddScoped<IRegistrationService, RegistrationService>();
-builder.Services.AddDbContextFactory<DataContext>();
+builder.Services.AddDbContextFactory<DataContext>(options => { options.UseNpgsql(appSettings.PostgresDsn); });
+builder.Services.AddScoped<IBlogService, BlogService>();
 
 builder.Services.AddSwaggerGen(options =>
 {
@@ -37,28 +40,26 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
         {
             ValidateIssuerSigningKey = true,
             IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8
-                .GetBytes(builder.Configuration.GetSection("AppSettings:Token").Value)),
+                .GetBytes(appSettings.JwtSecret)),
             ValidateIssuer = false,
             ValidateAudience = false
         };
     });
 
 var app = builder.Build();
+
 using (var scope = app.Services.CreateScope())
 {
     var dataContext = scope.ServiceProvider.GetRequiredService<DataContext>();
     dataContext.Database.Migrate();
 }
 
-
-// Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
 }
 
-app.UseHttpsRedirection();
 app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();
