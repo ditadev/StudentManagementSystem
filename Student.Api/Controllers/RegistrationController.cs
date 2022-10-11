@@ -24,7 +24,8 @@ public class RegistrationController : AbstractController
     public async Task<ActionResult<User>> Register(RegisterUserRequest request)
     {
         var passwordHash = _userService.CreatPasswordHash(request.Password);
-        var User = await _dataContext.Users.FirstOrDefaultAsync(x => x.IdentificationNumber == request.IdentificationNumber);
+        var User = await _dataContext.Users.FirstOrDefaultAsync(x =>
+            x.IdentificationNumber == request.IdentificationNumber);
         var checkUser = await _dataContext.Users.Where(x => x.IdentificationNumber == request.IdentificationNumber)
             .FirstOrDefaultAsync();
         if (User == null && checkUser != null)
@@ -46,7 +47,8 @@ public class RegistrationController : AbstractController
     [HttpPost]
     public async Task<ActionResult<string>> Login(LoginUserRequest request)
     {
-        var User = await _dataContext.Users.FirstOrDefaultAsync(x => x.IdentificationNumber == request.IdentificationNumber);
+        var User = await _dataContext.Users.FirstOrDefaultAsync(x =>
+            x.IdentificationNumber == request.IdentificationNumber);
 
         if (User == null) return BadRequest("Wrong username/password");
 

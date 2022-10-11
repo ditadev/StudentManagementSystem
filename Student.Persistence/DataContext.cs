@@ -18,7 +18,7 @@ public class DataContext : DbContext
     public DbSet<Department> Departments { get; set; }
     public DbSet<Course> Courses { get; set; }
     public DbSet<User> Users { get; set; }
-    
+
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

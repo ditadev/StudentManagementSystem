@@ -11,10 +11,10 @@ namespace Student.Services;
 
 public class UserService : IUserService
 {
-    private readonly DataContext _dataContext;
     private readonly IConfiguration _configuration;
+    private readonly DataContext _dataContext;
 
-    public UserService(DataContext dataContext,IConfiguration configuration)
+    public UserService(DataContext dataContext, IConfiguration configuration)
     {
         _dataContext = dataContext;
         _configuration = configuration;
@@ -53,8 +53,8 @@ public class UserService : IUserService
 
         return await Task.FromResult(jwt);
     }
-    
-    public async Task<Model.User?> GetStudentByAdmissionNumber(string admissionNumber)
+
+    public async Task<User?> GetStudentByAdmissionNumber(string admissionNumber)
     {
         var student = await _dataContext.Users
             .Where(x => x.IdentificationNumber == admissionNumber)

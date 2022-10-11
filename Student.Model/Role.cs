@@ -3,7 +3,7 @@ namespace Student.Model;
 public enum Role
 {
     Default,
-    Author,
-    Moderator,
-    Administrator
+    HeadOfDepartment,
+    Lecturer,
+    Student
 }
