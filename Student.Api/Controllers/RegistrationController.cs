@@ -46,12 +46,12 @@ public class RegistrationController : AbstractController
                     Roles = new List<Role> { Role.Student }
                 };
                 await _userService.AddUser(res);
-                return Ok("Successful :)");
+                return Ok(new {message = "Successful :)"});
             }
-            return BadRequest("User Already Exist :(");
+            return BadRequest(new {error="User Already Exist :("});
         }
 
-        return BadRequest("User Already Exist :(");
+        return BadRequest(new {error="User Already Exist :("});
     }
 
     [HttpPost]
@@ -59,9 +59,9 @@ public class RegistrationController : AbstractController
     {
         var user = await _userService.GetStudentByAdmissionNumber(request.IdentificationNumber);
         if (user==null) 
-            return BadRequest("Wrong username/password");
+            return BadRequest(new {error = "Wrong username/password"});
         if (_userService.VerifyPasswordHash(request.Password, user.PasswordHash) == false)
-            return BadRequest("Wrong username/password");
+            return BadRequest(new {error = "Wrong username/password"});
         
         return Ok(new JwtDto{AccessToken = await _userService.CreateJwt(user)});
     }

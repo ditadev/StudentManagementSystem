@@ -24,7 +24,7 @@ public class UserController : AbstractController
     {
         var userIdNumber = GetContextUserIdentificationNumber();
         var students = await _userService.GetStudentByAdmissionNumber(userIdNumber);
-        if (students == null) return NotFound("Not Found");
+        if (students == null) return NotFound(new {error ="Not Found"});
 
         return Ok(students);
     }
@@ -33,7 +33,12 @@ public class UserController : AbstractController
     [Attributes.Authorize(Role.HeadOfDepartment)]
     public async Task<ActionResult> DeleteUser(string admissionNumber)
     {
+        var user = await _userService.GetStudentByAdmissionNumber(admissionNumber);
+        if (user==null)
+        {
+            return NotFound(new {error ="Not Found"});
+        }
         await _userService.DeleteUser(admissionNumber);
-        return Ok("Student Deleted");
+        return Ok(new {message ="Student Deleted"});
     }
 }
