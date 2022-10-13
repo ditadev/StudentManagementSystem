@@ -2,7 +2,6 @@ using System.Security.Claims;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
-using NuGet.Packaging;
 using Student.Model.Enums;
 
 namespace StudentAPI.Attributes;
@@ -10,7 +9,7 @@ namespace StudentAPI.Attributes;
 [AttributeUsage(AttributeTargets.Class | AttributeTargets.Method)]
 public class AuthorizeAttribute : Attribute, IAuthorizationFilter
 {
-    private readonly IList<Role> _roles;
+    private readonly List<Role> _roles;
 
     public AuthorizeAttribute(Role firstRole, params Role[] otherRoles)
     {
