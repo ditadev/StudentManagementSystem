@@ -17,7 +17,8 @@ public class DataContext : DbContext
 
     public DbSet<Department> Departments { get; set; }
     public DbSet<Course> Courses { get; set; }
-    public DbSet<User?> Users { get; set; }
+    public DbSet<User> Users { get; set; }
+    public DbSet<Role> Roles { get; set; }
 
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -25,5 +26,6 @@ public class DataContext : DbContext
         modelBuilder.ApplyConfiguration(new EntityTypeConfigurations.User());
         modelBuilder.ApplyConfiguration(new EntityTypeConfigurations.Course());
         modelBuilder.ApplyConfiguration(new EntityTypeConfigurations.Department());
+        modelBuilder.ApplyConfiguration(new EntityTypeConfigurations.Role());
     }
 }

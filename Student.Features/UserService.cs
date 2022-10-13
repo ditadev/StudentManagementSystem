@@ -2,10 +2,10 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 using Student.Model;
 using Student.Persistence;
+using Role = Student.Model.Enums.Role;
 
 namespace Student.Services;
 
@@ -22,14 +22,16 @@ public class UserService : IUserService
 
     public async Task<User?> GetUserByEmail(string emailAddress)
     {
-        return await _dataContext.Users.Where(u => u != null && u.EmailAddress == emailAddress)
-            .Include(u=>u.Department)
-            .Include(u=>u.Courses)
+        return await _dataContext.Users.Where(u => u.EmailAddress == emailAddress)
+            .Include(u => u.Department)
+            .Include(u => u.Courses)
+            .Include(u => u.Roles)
             .SingleOrDefaultAsync();
     }
 
     public async Task AddUser(User user)
     {
+        user.Roles = new List<Model.Role?> { await _dataContext.Roles.SingleOrDefaultAsync(x => x.Id == Role.Student) };
         _dataContext.Add(user);
         await _dataContext.SaveChangesAsync();
     }
@@ -37,8 +39,8 @@ public class UserService : IUserService
     public async Task DeleteUser(string admissionNumber)
     {
         var user = await GetStudentByAdmissionNumber(admissionNumber);
-        _dataContext.Users.Remove(user);
-       await _dataContext.SaveChangesAsync();
+        if (user != null) _dataContext.Users.Remove(user);
+        await _dataContext.SaveChangesAsync();
     }
 
     public async Task<Department?> GetDepartmentById(string departmentId)
@@ -54,7 +56,7 @@ public class UserService : IUserService
             .ToListAsync();
     }
 
-    public async Task<string?> CreatPasswordHash(string password)
+    public async Task<string> CreatPasswordHash(string password)
     {
         return await Task.FromResult(BCrypt.Net.BCrypt.HashPassword(password));
     }
@@ -68,29 +70,32 @@ public class UserService : IUserService
     {
         var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_appSettings.JwtSecret));
         var cred = new SigningCredentials(key, SecurityAlgorithms.HmacSha512Signature);
-        var claims = new List<Claim> { new("userAdmissionNumber", user.IdentificationNumber),
-            new("sub", user.UserId.ToString()), 
-            new("role", "Default") };
-        
-        claims.AddRange(user.Roles.Select(role => new Claim("role", role.ToString())));
+        var claims = new List<Claim>
+        {
+            new("userAdmissionNumber", user.IdentificationNumber),
+            new("sub", user.UserId.ToString()),
+            new("role", Role.Default.ToString())
+        };
 
-        return Task.FromResult((new JwtSecurityTokenHandler().WriteToken(
+        claims.AddRange(user.Roles.Select(role => new Claim("role", role.Id.ToString())));
+
+        return Task.FromResult(new JwtSecurityTokenHandler().WriteToken(
             new JwtSecurityToken
             (
                 claims: claims,
                 expires: DateTime.Now.AddDays(1),
                 signingCredentials: cred
-            ))));
+            )));
     }
 
-    public async Task<User> GetStudentByAdmissionNumber(string admissionNumber)
+    public async Task<User?> GetStudentByAdmissionNumber(string admissionNumber)
     {
         return await _dataContext.Users
             .Where(x => x.IdentificationNumber == admissionNumber)
             .Include(x => x.Courses)
             .Include(x => x.Department)
-            .SingleOrDefaultAsync();;
+            .Include(x => x.Roles)
+            .SingleOrDefaultAsync();
+        ;
     }
-    
-    
 }

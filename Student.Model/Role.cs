@@ -1,9 +1,7 @@
 namespace Student.Model;
 
-public enum Role
+public class Role
 {
-    Default,
-    HeadOfDepartment,
-    Lecturer,
-    Student
+    public Enums.Role Id { get; set; }
+    public List<User> Users { get; set; }
 }

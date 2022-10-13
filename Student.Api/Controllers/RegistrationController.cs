@@ -1,5 +1,4 @@
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using Student.Model;
 using Student.Persistence;
 using Student.Services;
@@ -11,13 +10,11 @@ namespace StudentAPI.Controllers;
 [ApiController]
 public class RegistrationController : AbstractController
 {
-    private readonly DataContext _dataContext;
     private readonly IUserService _userService;
 
-    public RegistrationController(IUserService userService, DataContext dataContext)
+    public RegistrationController(IUserService userService)
     {
         _userService = userService;
-        _dataContext = dataContext;
     }
 
     [HttpPost]
@@ -26,9 +23,9 @@ public class RegistrationController : AbstractController
         var passwordHash = await _userService.CreatPasswordHash(request.Password);
         var department = await _userService.GetDepartmentById(request.DepartmentId);
         var courses = await _userService.GetCoursesByDepartment(request.DepartmentId);
-        var User = await _userService.GetStudentByAdmissionNumber(request.IdentificationNumber);
+        var studentByAdmissionNumber = await _userService.GetStudentByAdmissionNumber(request.IdentificationNumber);
         var userByEmail = await _userService.GetUserByEmail(request.EmailAddress);
-        if (User == null)
+        if (studentByAdmissionNumber == null)
         {
             if (userByEmail == null)
             {
@@ -42,27 +39,27 @@ public class RegistrationController : AbstractController
                     Department = department,
                     PasswordHash = passwordHash,
                     Courses = courses,
-                    EmailAddress = request.EmailAddress,
-                    Roles = new List<Role> { Role.Student }
+                    EmailAddress = request.EmailAddress
                 };
                 await _userService.AddUser(res);
-                return Ok(new {message = "Successful :)"});
+                return Ok(new { message = "Successful :)" });
             }
-            return BadRequest(new {error="User Already Exist :("});
+
+            return BadRequest(new { error = "User Already Exist :(" });
         }
 
-        return BadRequest(new {error="User Already Exist :("});
+        return BadRequest(new { error = "User Already Exist :(" });
     }
 
     [HttpPost]
     public async Task<ActionResult<string>> Login(LoginUserRequest request)
     {
         var user = await _userService.GetStudentByAdmissionNumber(request.IdentificationNumber);
-        if (user==null) 
-            return BadRequest(new {error = "Wrong username/password"});
+        if (user == null)
+            return BadRequest(new { error = "Wrong username/password" });
         if (_userService.VerifyPasswordHash(request.Password, user.PasswordHash) == false)
-            return BadRequest(new {error = "Wrong username/password"});
-        
-        return Ok(new JwtDto{AccessToken = await _userService.CreateJwt(user)});
+            return BadRequest(new { error = "Wrong username/password" });
+
+        return Ok(new JwtDto { AccessToken = await _userService.CreateJwt(user) });
     }
 }

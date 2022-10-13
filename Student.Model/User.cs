@@ -14,6 +14,6 @@ public class User
     [JsonIgnore] public string Password { get; set; }
     public Department? Department { get; set; }
     [JsonIgnore] public string DepartmentId { get; set; }
-    [JsonIgnore] public List<Role> Roles { get; set; }
+    [JsonIgnore] public List<Role?> Roles { get; set; }
     public List<Course> Courses { get; set; }
 }
