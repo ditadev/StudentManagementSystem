@@ -102,6 +102,23 @@ namespace Student.Persistence.Migrations
                         .IsUnique();
 
                     b.ToTable("Departments");
+
+                    b.HasData(
+                        new
+                        {
+                            DepartmentId = "CSC",
+                            DepartmentName = "Computer Science"
+                        },
+                        new
+                        {
+                            DepartmentId = "MTH",
+                            DepartmentName = "Mathematics"
+                        },
+                        new
+                        {
+                            DepartmentId = "STA",
+                            DepartmentName = "Statistics"
+                        });
                 });
 
             modelBuilder.Entity("Student.Model.Role", b =>

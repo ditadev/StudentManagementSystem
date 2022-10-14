@@ -11,8 +11,8 @@ using Student.Persistence;
 namespace Student.Persistence.Migrations
 {
     [DbContext(typeof(DataContext))]
-    [Migration("20221013183503_initial")]
-    partial class initial
+    [Migration("20221013235949_first")]
+    partial class first
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -104,6 +104,23 @@ namespace Student.Persistence.Migrations
                         .IsUnique();
 
                     b.ToTable("Departments");
+
+                    b.HasData(
+                        new
+                        {
+                            DepartmentId = "CSC",
+                            DepartmentName = "Computer Science"
+                        },
+                        new
+                        {
+                            DepartmentId = "MTH",
+                            DepartmentName = "Mathematics"
+                        },
+                        new
+                        {
+                            DepartmentId = "STA",
+                            DepartmentName = "Statistics"
+                        });
                 });
 
             modelBuilder.Entity("Student.Model.Role", b =>
